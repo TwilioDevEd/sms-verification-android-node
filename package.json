@@ -1,0 +1,33 @@
+{
+  "name": "sms-verification-android-node",
+  "version": "1.0.0",
+  "description": "Quick Start application template for SMS Verification for Android on Node.js",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "NODE_ENV=test && ./node_modules/.bin/eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "twilio",
+    "sms",
+    "verification",
+    "android"
+  ],
+  "author": "Twilio Developer Education",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "dotenv": "^2.0.0",
+    "express": "^4.14.0",
+    "mem-cache": "0.0.5",
+    "twilio": "3.0.0-rc.17"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-google": "^0.7.1"
+  }
+}
