@@ -24,7 +24,7 @@
     "dotenv": "^2.0.0",
     "express": "^4.14.0",
     "mem-cache": "0.0.5",
-    "twilio": "3.0.0-rc.17"
+    "twilio": "3.41.1"
   },
   "devDependencies": {
     "eslint": "^3.19.0",
