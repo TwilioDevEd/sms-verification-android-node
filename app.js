@@ -127,7 +127,8 @@ app.post('/api/reset', jsonBodyParser, function(request, response) {
 
     if (clientSecret == null || phone == null) {
         // send an error saying that all parameters are required
-        response.send(500, 'The client_secret and phone parameters are required');
+        response.send(500,
+            'The client_secret and phone parameters are required');
         return;
     }
 
@@ -162,7 +163,7 @@ app.get('/config', function(request, response) {
     TWILIO_API_SECRET: process.env.TWILIO_API_SECRET != '',
     CLIENT_SECRET: process.env.CLIENT_SECRET,
     APP_HASH: process.env.APP_HASH,
-    VERIFICATION_SERVICE_SID: process.env.VERIFICATION_SERVICE_SID
+    VERIFICATION_SERVICE_SID: process.env.VERIFICATION_SERVICE_SID,
   });
 });
 
