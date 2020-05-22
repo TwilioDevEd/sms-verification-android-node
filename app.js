@@ -24,38 +24,38 @@ if (process.env.TWILIO_API_KEY == null ||
     process.env.TWILIO_ACCOUNT_SID == null ||
     process.env.VERIFICATION_SERVICE_SID == null ||
     process.env.COUNTRY_CODE == null) {
-        console.log('Please copy the .env.example file to .env, ' +
+  console.log('Please copy the .env.example file to .env, ' +
                     'and then add your Twilio API Key, API Secret, ' +
                     'and Account SID to the .env file. ' +
                     'Find them on https://www.twilio.com/console');
-        process.exit();
+  process.exit();
 }
 
 if (process.env.APP_HASH == null) {
-    console.log('Please provide a valid Android app hash, ' +
+  console.log('Please provide a valid Android app hash, ' +
                 'in the .env file');
-    process.exit();
+  process.exit();
 }
 
 if (process.env.CLIENT_SECRET == null) {
-    console.log('Please provide a secret string to share, ' +
+  console.log('Please provide a secret string to share, ' +
                 'between the app and the server ' +
                 'in the .env file');
-    process.exit();
+  process.exit();
 }
 
 const configuredClientSecret = process.env.CLIENT_SECRET;
 
 // Initialize the Twilio Client
 const twilioClient = new Twilio(process.env.TWILIO_API_KEY,
-                        process.env.TWILIO_API_SECRET,
-                        {accountSid: process.env.TWILIO_ACCOUNT_SID});
+    process.env.TWILIO_API_SECRET,
+    {accountSid: process.env.TWILIO_ACCOUNT_SID});
 
 const SMSVerify = require('./SMSVerify.js');
 const smsVerify = new SMSVerify(twilioClient,
-                    process.env.APP_HASH,
-                    process.env.VERIFICATION_SERVICE_SID,
-                    process.env.COUNTRY_CODE);
+    process.env.APP_HASH,
+    process.env.VERIFICATION_SERVICE_SID,
+    process.env.COUNTRY_CODE);
 
 // Create Express webapp
 const app = express();
@@ -65,93 +65,93 @@ app.use(express.static(path.join(__dirname, 'public')));
     Sends a one-time code to the user's phone number for verification
 */
 app.post('/api/request', jsonBodyParser, function(request, response) {
-    const clientSecret = request.body.client_secret;
-    const phone = request.body.phone;
+  const clientSecret = request.body.client_secret;
+  const phone = request.body.phone;
 
-    if (clientSecret == null || phone == null) {
-        // send an error saying that both client_secret and phone are required
-        response.send(500, 'Both client_secret and phone are required.');
-        return;
-    }
+  if (clientSecret == null || phone == null) {
+    // send an error saying that both client_secret and phone are required
+    response.send(500, 'Both client_secret and phone are required.');
+    return;
+  }
 
-    if (configuredClientSecret != clientSecret) {
-        response.send(500, 'The client_secret parameter does not match.');
-        return;
-    }
+  if (configuredClientSecret != clientSecret) {
+    response.send(500, 'The client_secret parameter does not match.');
+    return;
+  }
 
-    smsVerify.request(phone);
-    response.send({
-        success: true,
-    });
+  smsVerify.request(phone);
+  response.send({
+    success: true,
+  });
 });
 
 /*
     Verifies the one-time code for a phone number
 */
 app.post('/api/verify', jsonBodyParser, function(request, response) {
-    const clientSecret = request.body.client_secret;
-    const phone = request.body.phone;
-    const smsMessage = request.body.sms_message;
+  const clientSecret = request.body.client_secret;
+  const phone = request.body.phone;
+  const smsMessage = request.body.sms_message;
 
-    if (clientSecret == null || phone == null || smsMessage == null) {
-        // send an error saying that all parameters are required
-        response.send(500, 'The client_secret, phone, ' +
+  if (clientSecret == null || phone == null || smsMessage == null) {
+    // send an error saying that all parameters are required
+    response.send(500, 'The client_secret, phone, ' +
                     'and sms_message parameters are required');
-        return;
-    }
+    return;
+  }
 
-    if (configuredClientSecret != clientSecret) {
-        response.send(500, 'The client_secret parameter does not match.');
-        return;
-    }
+  if (configuredClientSecret != clientSecret) {
+    response.send(500, 'The client_secret parameter does not match.');
+    return;
+  }
 
-    smsVerify.verify(phone, smsMessage, function(isSuccessful) {
-        if (isSuccessful) {
-            response.send({
-                success: true,
-                phone: phone,
-            });
-        } else {
-            response.send({
-                success: false,
-                msg: 'Unable to validate code for this phone number',
-            });
-        }
-    });
+  smsVerify.verify(phone, smsMessage, function(isSuccessful) {
+    if (isSuccessful) {
+      response.send({
+        success: true,
+        phone: phone,
+      });
+    } else {
+      response.send({
+        success: false,
+        msg: 'Unable to validate code for this phone number',
+      });
+    }
+  });
 });
 
 /*
     Resets the one-time code for a phone number
 */
 app.post('/api/reset', jsonBodyParser, function(request, response) {
-    const clientSecret = request.body.client_secret;
-    const phone = request.body.phone;
+  const clientSecret = request.body.client_secret;
+  const phone = request.body.phone;
 
-    if (clientSecret == null || phone == null) {
-        // send an error saying that all parameters are required
-        response.send(500,
-            'The client_secret and phone parameters are required');
-        return;
-    }
+  if (clientSecret == null || phone == null) {
+    // send an error saying that all parameters are required
+    response.send(500,
+        'The client_secret and phone parameters are required');
+    return;
+  }
 
-    if (configuredClientSecret != clientSecret) {
-        response.send(500, 'The client_secret parameter does not match.');
-        return;
-    }
+  if (configuredClientSecret != clientSecret) {
+    response.send(500, 'The client_secret parameter does not match.');
+    return;
+  }
 
-    const isSuccessful = smsVerify.reset(phone);
+  const isSuccessful = smsVerify.reset(phone);
 
-    if (isSuccessful) {
-        response.send({
-            success: true,
-            phone: phone,
-        });
-    } else {
-        response.send({
-            success: false,
-            msg: 'Unable to reset code for this phone number',
-        });
-    }
+  if (isSuccessful) {
+    response.send({
+      success: true,
+      phone: phone,
+    });
+  } else {
+    response.send({
+      success: false,
+      msg: 'Unable to reset code for this phone number',
+    });
+  }
 });
 
 /*
@@ -175,5 +175,5 @@ app.get('/config', function(request, response) {
 const server = http.createServer(app);
 const port = process.env.PORT || 3000;
 server.listen(port, function() {
-    console.log('Express server running on *:' + port);
+  console.log('Express server running on *:' + port);
 });
