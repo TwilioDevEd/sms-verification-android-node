@@ -78,8 +78,7 @@ app.post('/api/request', jsonBodyParser, function(request, response) {
 
     smsVerify.request(phone);
     response.send({
-        success: true,
-        time: smsVerify.getExpiration(),
+        success: true
     });
 });
 
