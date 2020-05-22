@@ -4,8 +4,9 @@
     process.env.TWILIO_ACCOUNT_SID
     process.env.TWILIO_API_KEY
     process.env.TWILIO_API_SECRET
-    process.env.SENDING_PHONE_NUMBER
     process.env.APP_HASH
+    process.env.VERIFICATION_SERVICE_SID
+    process.env.COUNTRY_CODE
 */
 require('dotenv').load();
 const http = require('http');
@@ -20,18 +21,14 @@ const Twilio = require('twilio');
 // Check configuration variables
 if (process.env.TWILIO_API_KEY == null ||
     process.env.TWILIO_API_SECRET == null ||
-    process.env.TWILIO_ACCOUNT_SID == null) {
+    process.env.TWILIO_ACCOUNT_SID == null ||
+    process.env.VERIFICATION_SERVICE_SID == null ||
+    process.env.COUNTRY_CODE == null) {
         console.log('Please copy the .env.example file to .env, ' +
                     'and then add your Twilio API Key, API Secret, ' +
                     'and Account SID to the .env file. ' +
                     'Find them on https://www.twilio.com/console');
         process.exit();
-}
-
-if (process.env.SENDING_PHONE_NUMBER == null) {
-    console.log('Please provide a valid phone number, ' +
-                'such as +15125551212, in the .env file');
-    process.exit();
 }
 
 if (process.env.APP_HASH == null) {
@@ -56,8 +53,9 @@ const twilioClient = new Twilio(process.env.TWILIO_API_KEY,
 
 const SMSVerify = require('./SMSVerify.js');
 const smsVerify = new SMSVerify(twilioClient,
-                    process.env.SENDING_PHONE_NUMBER,
-                    process.env.APP_HASH);
+                    process.env.APP_HASH,
+                    process.env.VERIFICATION_SERVICE_SID,
+                    process.env.COUNTRY_CODE);
 
 // Create Express webapp
 const app = express();
@@ -84,7 +82,6 @@ app.post('/api/request', jsonBodyParser, function(request, response) {
     smsVerify.request(phone);
     response.send({
         success: true,
-        time: smsVerify.getExpiration(),
     });
 });
 
@@ -108,19 +105,19 @@ app.post('/api/verify', jsonBodyParser, function(request, response) {
         return;
     }
 
-    const isSuccessful = smsVerify.verify(phone, smsMessage);
-
-    if (isSuccessful) {
-        response.send({
-            success: true,
-            phone: phone,
-        });
-    } else {
-        response.send({
-            success: false,
-            msg: 'Unable to validate code for this phone number',
-        });
-    }
+    smsVerify.verify(phone, smsMessage, function(isSuccessful) {
+        if (isSuccessful) {
+            response.send({
+                success: true,
+                phone: phone,
+            });
+        } else {
+            response.send({
+                success: false,
+                msg: 'Unable to validate code for this phone number',
+            });
+        }
+    });
 });
 
 /*
@@ -132,7 +129,8 @@ app.post('/api/reset', jsonBodyParser, function(request, response) {
 
     if (clientSecret == null || phone == null) {
         // send an error saying that all parameters are required
-        response.send(500, 'The client_secret and phone parameters are required');
+        response.send(500,
+            'The client_secret and phone parameters are required');
         return;
     }
 
@@ -165,9 +163,10 @@ app.get('/config', function(request, response) {
     TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
     TWILIO_API_KEY: process.env.TWILIO_API_KEY,
     TWILIO_API_SECRET: process.env.TWILIO_API_SECRET != '',
-    SENDING_PHONE_NUMBER: process.env.SENDING_PHONE_NUMBER,
     CLIENT_SECRET: process.env.CLIENT_SECRET,
     APP_HASH: process.env.APP_HASH,
+    VERIFICATION_SERVICE_SID: process.env.VERIFICATION_SERVICE_SID,
+    COUNTRY_CODE: process.env.COUNTRY_CODE,
   });
 });
 

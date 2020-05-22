@@ -1,63 +1,64 @@
-// This mem-cache module is a local in-memory cache - for production use, you would replace this with Memcache, Redis, or a database
-const Cache = require('mem-cache');
-const cache = new Cache();
 
-function SMSVerify(twilioClient, sendingPhoneNumber, appHash) {
+function SMSVerify(twilioClient, appHash, verificationServiceSID, countryCode) {
     this.twilioClient = twilioClient;
-    this.sendingPhoneNumber = sendingPhoneNumber;
     this.appHash = appHash;
+    this.verificationServiceSID = verificationServiceSID;
+    this.countryCode = countryCode;
 };
 
 module.exports = SMSVerify;
 
-SMSVerify.prototype.generateOneTimeCode = function() {
-    const codelength = 6;
-    return Math.floor(Math.random() * (Math.pow(10, (codelength - 1)) * 9)) + Math.pow(10, (codelength - 1));
-};
-
-SMSVerify.prototype.getExpiration = function() {
-    return 900;
+SMSVerify.prototype.getE164Number = function(phone, callback) {
+    this.twilioClient.lookups.phoneNumbers(phone)
+        .fetch({countryCode: this.countryCode})
+        .then((lookupResult) => {
+            console.log(lookupResult.phoneNumber);
+            callback(lookupResult.phoneNumber);
+        })
+        .catch((error) => {
+            console.error(error);
+            callback(null);
+        });
 };
 
 SMSVerify.prototype.request = function(phone) {
-    console.log('Requesting SMS to be sent to ' + phone);
-
-    const otp = this.generateOneTimeCode();
-    cache.set(phone, otp, this.getExpiration() * 1000);
-
-    const smsMessage = '[#] Use ' + otp + ' as your code for the app!\n' + this.appHash;
-    console.log(smsMessage);
-
-    this.twilioClient.messages.create({
-        to: phone,
-        from: this.sendingPhoneNumber,
-        body: smsMessage,
-    }).then((message) => console.log(message.sid));
+    console.log('Requesting verification SMS to be sent to ' + phone);
+    this.getE164Number(phone, (formattedPhoneNumber) => {
+        this.twilioClient.verify.services(this.verificationServiceSID)
+        .verifications
+        .create({
+            to: formattedPhoneNumber,
+            channel: 'sms',
+            appHash: this.appHash,
+        })
+        .then((verification)=> console.log(verification.sid))
+        .catch((error) => console.error(error));
+    });
 };
 
-SMSVerify.prototype.verify = function(phone, smsMessage) {
+SMSVerify.prototype.verify = function(phone, smsMessage, callback) {
     console.log('Verifying ' + phone + ':' + smsMessage);
-    const otp = cache.get(phone);
-    if (otp == null) {
-        console.log('No cached otp value found for phone: ' + phone);
-        return false;
-    }
-    if (smsMessage.indexOf(otp) > -1) {
-        console.log('Found otp value in cache');
-        return true;
-    } else {
-        console.log('Mismatch between otp value found and otp value expected');
-        return false;
-    }
+
+    // This regexp finds the last numeric code in the message, of any length
+    let code = smsMessage.match(/[0-9]+(?!.*[0-9])/);
+    console.log('Verifying code: (' + code + ')');
+    this.getE164Number(phone, (formattedPhoneNumber) => {
+        this.twilioClient.verify.services(this.verificationServiceSID)
+        .verificationChecks
+        .create({to: formattedPhoneNumber, code: code})
+        .then((verificationCheck) => {
+            console.log(verificationCheck);
+            callback(verificationCheck.status == 'approved');
+        })
+        .catch((error) => {
+            console.error(error);
+            callback(false);
+        });
+    });
 };
 
 SMSVerify.prototype.reset = function(phone) {
     console.log('Resetting code for:  ' + phone);
-    const otp = cache.get(phone);
-    if (otp == null) {
-        console.log('No cached otp value found for phone: ' + phone);
-        return false;
-    }
-    cache.remove(phone);
+    // Not needed for Verify
     return true;
 };
