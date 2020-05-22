@@ -1,7 +1,6 @@
 
-function SMSVerify(twilioClient, sendingPhoneNumber, appHash, verificationServiceSID) {
+function SMSVerify(twilioClient, appHash, verificationServiceSID) {
     this.twilioClient = twilioClient;
-    this.sendingPhoneNumber = sendingPhoneNumber;
     this.appHash = appHash;
     this.verificationServiceSID = verificationServiceSID;
 };

@@ -4,7 +4,6 @@
     process.env.TWILIO_ACCOUNT_SID
     process.env.TWILIO_API_KEY
     process.env.TWILIO_API_SECRET
-    process.env.SENDING_PHONE_NUMBER
     process.env.APP_HASH
     process.env.VERIFICATION_SERVICE_SID
 */
@@ -30,12 +29,6 @@ if (process.env.TWILIO_API_KEY == null ||
         process.exit();
 }
 
-if (process.env.SENDING_PHONE_NUMBER == null) {
-    console.log('Please provide a valid phone number, ' +
-                'such as +15125551212, in the .env file');
-    process.exit();
-}
-
 if (process.env.APP_HASH == null) {
     console.log('Please provide a valid Android app hash, ' +
                 'in the .env file');
@@ -58,7 +51,6 @@ const twilioClient = new Twilio(process.env.TWILIO_API_KEY,
 
 const SMSVerify = require('./SMSVerify.js');
 const smsVerify = new SMSVerify(twilioClient,
-                    process.env.SENDING_PHONE_NUMBER,
                     process.env.APP_HASH,
                     process.env.VERIFICATION_SERVICE_SID);
 
@@ -168,7 +160,6 @@ app.get('/config', function(request, response) {
     TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
     TWILIO_API_KEY: process.env.TWILIO_API_KEY,
     TWILIO_API_SECRET: process.env.TWILIO_API_SECRET != '',
-    SENDING_PHONE_NUMBER: process.env.SENDING_PHONE_NUMBER,
     CLIENT_SECRET: process.env.CLIENT_SECRET,
     APP_HASH: process.env.APP_HASH,
     VERIFICATION_SERVICE_SID: process.env.VERIFICATION_SERVICE_SID
