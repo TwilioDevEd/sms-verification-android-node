@@ -8,6 +8,7 @@ $(function() {
         configureField(response, 'CLIENT_SECRET', 'clientSecret', false);
         configureField(response,
             'VERIFICATION_SERVICE_SID', 'verificationServiceSID', false);
+        configureField(response, 'COUNTRY_CODE', 'countryCode', false);
     });
     const configureField = function(response, keyName, elementId, masked) {
         if (masked) {

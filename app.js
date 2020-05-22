@@ -6,6 +6,7 @@
     process.env.TWILIO_API_SECRET
     process.env.APP_HASH
     process.env.VERIFICATION_SERVICE_SID
+    process.env.COUNTRY_CODE
 */
 require('dotenv').load();
 const http = require('http');
@@ -21,7 +22,8 @@ const Twilio = require('twilio');
 if (process.env.TWILIO_API_KEY == null ||
     process.env.TWILIO_API_SECRET == null ||
     process.env.TWILIO_ACCOUNT_SID == null ||
-    process.env.VERIFICATION_SERVICE_SID == null) {
+    process.env.VERIFICATION_SERVICE_SID == null ||
+    process.env.COUNTRY_CODE == null) {
         console.log('Please copy the .env.example file to .env, ' +
                     'and then add your Twilio API Key, API Secret, ' +
                     'and Account SID to the .env file. ' +
@@ -52,7 +54,8 @@ const twilioClient = new Twilio(process.env.TWILIO_API_KEY,
 const SMSVerify = require('./SMSVerify.js');
 const smsVerify = new SMSVerify(twilioClient,
                     process.env.APP_HASH,
-                    process.env.VERIFICATION_SERVICE_SID);
+                    process.env.VERIFICATION_SERVICE_SID,
+                    process.env.COUNTRY_CODE);
 
 // Create Express webapp
 const app = express();
@@ -163,6 +166,7 @@ app.get('/config', function(request, response) {
     CLIENT_SECRET: process.env.CLIENT_SECRET,
     APP_HASH: process.env.APP_HASH,
     VERIFICATION_SERVICE_SID: process.env.VERIFICATION_SERVICE_SID,
+    COUNTRY_CODE: process.env.COUNTRY_CODE,
   });
 });
 
