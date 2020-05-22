@@ -19,7 +19,7 @@ SMSVerify.prototype.getE164Number = function(phone, callback) {
             console.error(error);
             callback(null);
         });
-}
+};
 
 SMSVerify.prototype.request = function(phone) {
     console.log('Requesting verification SMS to be sent to ' + phone);
@@ -34,8 +34,6 @@ SMSVerify.prototype.request = function(phone) {
         .then((verification)=> console.log(verification.sid))
         .catch((error) => console.error(error));
     });
-
-
 };
 
 SMSVerify.prototype.verify = function(phone, smsMessage, callback) {

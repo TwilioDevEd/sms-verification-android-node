@@ -81,7 +81,7 @@ app.post('/api/request', jsonBodyParser, function(request, response) {
 
     smsVerify.request(phone);
     response.send({
-        success: true
+        success: true,
     });
 });
 
