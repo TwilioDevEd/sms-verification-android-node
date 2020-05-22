@@ -23,7 +23,7 @@
     "body-parser": "^1.15.2",
     "dotenv": "^2.0.0",
     "express": "^4.14.0",
-    "twilio": "^3.39.4"
+    "twilio": "^3.43.1"
   },
   "devDependencies": {
     "eslint": "^3.19.0",
