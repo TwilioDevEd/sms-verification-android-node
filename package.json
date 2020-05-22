@@ -23,7 +23,6 @@
     "body-parser": "^1.15.2",
     "dotenv": "^2.0.0",
     "express": "^4.14.0",
-    "mem-cache": "0.0.5",
     "twilio": "^3.39.4"
   },
   "devDependencies": {

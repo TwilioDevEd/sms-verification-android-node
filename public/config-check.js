@@ -6,6 +6,8 @@ $(function() {
         configureField(response, 'SENDING_PHONE_NUMBER', 'sendingPhoneNumber', false);
         configureField(response, 'APP_HASH', 'appHash', false);
         configureField(response, 'CLIENT_SECRET', 'clientSecret', false);
+        configureField(response, 'VERIFICATION_SERVICE_SID', 'verificationServiceSID', false);
+
     });
     const configureField = function(response, keyName, elementId, masked) {
         if (masked) {

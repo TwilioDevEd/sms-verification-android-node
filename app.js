@@ -6,6 +6,7 @@
     process.env.TWILIO_API_SECRET
     process.env.SENDING_PHONE_NUMBER
     process.env.APP_HASH
+    process.env.VERIFICATION_SERVICE_SID
 */
 require('dotenv').load();
 const http = require('http');
@@ -20,7 +21,8 @@ const Twilio = require('twilio');
 // Check configuration variables
 if (process.env.TWILIO_API_KEY == null ||
     process.env.TWILIO_API_SECRET == null ||
-    process.env.TWILIO_ACCOUNT_SID == null) {
+    process.env.TWILIO_ACCOUNT_SID == null ||
+    process.env.VERIFICATION_SERVICE_SID == null) {
         console.log('Please copy the .env.example file to .env, ' +
                     'and then add your Twilio API Key, API Secret, ' +
                     'and Account SID to the .env file. ' +
@@ -57,7 +59,8 @@ const twilioClient = new Twilio(process.env.TWILIO_API_KEY,
 const SMSVerify = require('./SMSVerify.js');
 const smsVerify = new SMSVerify(twilioClient,
                     process.env.SENDING_PHONE_NUMBER,
-                    process.env.APP_HASH);
+                    process.env.APP_HASH,
+                    process.env.VERIFICATION_SERVICE_SID);
 
 // Create Express webapp
 const app = express();
@@ -108,19 +111,19 @@ app.post('/api/verify', jsonBodyParser, function(request, response) {
         return;
     }
 
-    const isSuccessful = smsVerify.verify(phone, smsMessage);
-
-    if (isSuccessful) {
-        response.send({
-            success: true,
-            phone: phone,
-        });
-    } else {
-        response.send({
-            success: false,
-            msg: 'Unable to validate code for this phone number',
-        });
-    }
+    smsVerify.verify(phone, smsMessage, function(isSuccessful) {
+        if (isSuccessful) {
+            response.send({
+                success: true,
+                phone: phone,
+            });
+        } else {
+            response.send({
+                success: false,
+                msg: 'Unable to validate code for this phone number',
+            });
+        }
+    });
 });
 
 /*
@@ -168,6 +171,7 @@ app.get('/config', function(request, response) {
     SENDING_PHONE_NUMBER: process.env.SENDING_PHONE_NUMBER,
     CLIENT_SECRET: process.env.CLIENT_SECRET,
     APP_HASH: process.env.APP_HASH,
+    VERIFICATION_SERVICE_SID: process.env.VERIFICATION_SERVICE_SID
   });
 });
 

@@ -27,6 +27,7 @@ Open `.env` in your favorite text editor and configure the following values. You
 `SENDING_PHONE_NUMBER` | This phone number will be sending the SMS messages to the Android device. Either use a phone number you purchased through Twilio, or one you have verified with your account.
 `APP_HASH` | Matches the Android application to the SMS message - See Google's documentation on how to [Compute your app's hash string](https://developers.google.com/identity/sms-retriever/verify#computing_your_apps_hash_string).
 `CLIENT_SECRET` | Matches the Android application to the server - you can set this in the `strings.xml` file in your Android application. It must match the server's config value. You can also override it in the Settings menu of the app.
+`VERIFICATION_SERVICE_SID` | This project uses Twilio Verify to send verification codes and to check their status - [create a service here](https://www.twilio.com/console/verify/services).
 
 #### A Note on API Keys
 
