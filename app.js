@@ -70,12 +70,12 @@ app.post('/api/request', jsonBodyParser, function(request, response) {
 
   if (clientSecret == null || phone == null) {
     // send an error saying that both client_secret and phone are required
-    response.status(500).send('Both client_secret and phone are required.');
+    response.send(500, 'Both client_secret and phone are required.');
     return;
   }
 
   if (configuredClientSecret != clientSecret) {
-    response.status(500).send('The client_secret parameter does not match.');
+    response.send(500, 'The client_secret parameter does not match.');
     return;
   }
 
@@ -95,13 +95,13 @@ app.post('/api/verify', jsonBodyParser, function(request, response) {
 
   if (clientSecret == null || phone == null || smsMessage == null) {
     // send an error saying that all parameters are required
-    response.status(500).send('The client_secret, phone, ' +
+    response.send(500, 'The client_secret, phone, ' +
                     'and sms_message parameters are required');
     return;
   }
 
   if (configuredClientSecret != clientSecret) {
-    response.status(500).send('The client_secret parameter does not match.');
+    response.send(500, 'The client_secret parameter does not match.');
     return;
   }
 
@@ -170,25 +170,12 @@ app.get('/config', function(request, response) {
   });
 });
 
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err,
-    });
-  });
-}
-
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
+  console.trace(err);
   res.status(err.status || 500);
-  res.render('error', {
+  res.send({
     message: err.message,
     error: {},
   });
