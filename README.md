@@ -1,5 +1,7 @@
 # SMS Verification for Android - Server for Node.js
 
+[![Node.js CI](https://github.com/TwilioDevEd/sms-verification-android-node/actions/workflows/nodejs.yml/badge.svg)](https://github.com/TwilioDevEd/sms-verification-android-node/actions/workflows/nodejs.yml)
+
 This sample project demonstrates how to use Twilio's [Verify](https://www.twilio.com/verify/)
 to verify Android application user's phone numbers. This application supports the [SMS Retriever API](https://developers.google.com/identity/sms-retriever/overview)
 from Google.

@@ -170,6 +170,16 @@ app.get('/config', function(request, response) {
   });
 });
 
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+  console.trace(err);
+  res.status(err.status || 500);
+  res.send({
+    message: err.message,
+    error: {},
+  });
+});
 
 // Create http server and run it
 const server = http.createServer(app);
